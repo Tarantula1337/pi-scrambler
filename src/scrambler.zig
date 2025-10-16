@@ -34,28 +34,43 @@ fn calc_num_of_pi(password: []u8) i64 {
     return num;
 }
 
-fn correct_password(old_password: []u8) []u8 {
-    // Check for invalid characters
-    for (old_password) |i| {
+fn check_for_lowercase(letter: u8) bool {
+    if (97 <= letter and letter <= 122) {
+        return true;
+    }
+
+    return false;
+}
+
+fn check_for_uppercase(letter: u8) bool {
+    if (65 <= letter and letter <= 90) {
+        return true;
+    }
+
+    return false;
+}
+
+fn correct_password(password: []u8) []u8 {
+    // TODO: Make sure invalid characters END the method
+    for (password) |i| {
         if (i == 32) {
             std.debug.print("ERROR: Password contains invalid character!\n", .{});
             break;
         }
     }
 
-    for (old_password, 0..old_password.len) |_, i| {
-        if (i != 0 and i != old_password.len - 1) {
-            if (97 <= old_password[i - 1] and old_password[i - 1] <= 122) {
-                if (97 <= old_password[i] and old_password[i] <= 122) {
-                    if (97 <= old_password[i + 1] and old_password[i + 1] <= 122) {
-                        old_password[i] = old_password[i] - 32;
-                    }
-                }
+    for (password, 0..password.len) |_, i| {
+        if (i != 0 and i != password.len - 1) {
+            if (check_for_lowercase(password[i - 1]) and check_for_lowercase(password[i]) and check_for_lowercase(password[i + 1])) {
+                password[i] = password[i] - 32;
+            }
+            if (check_for_uppercase(password[i - 1]) and check_for_uppercase(password[i]) and check_for_uppercase(password[i + 1])) {
+                std.debug.print("Oops, only uppercase!\n", .{});
             }
         }
     }
 
-    return old_password;
+    return password;
 }
 
 pub fn main() !void {
