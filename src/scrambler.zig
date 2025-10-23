@@ -14,13 +14,7 @@ fn read_milliseconds() i64 {
     now = std.time.milliTimestamp();
     now &= 2047;
     // Normalize milliseconds
-    if (now > 1000) {
-        if (now > 2000) {
-            now = now - 2000;
-        } else {
-            now = now - 1000;
-        }
-    }
+    now = @rem(now, 1000);
     return now;
 }
 
@@ -32,6 +26,16 @@ fn calc_num_of_pi(password: []u8) i64 {
     }
     num = num + read_milliseconds();
     return num;
+}
+
+fn check_invalid_chars(password: []u8) bool {
+    for (password) |i| {
+        if (i == 32) {
+            std.debug.print("ERROR: Password contains invalid character!\n", .{});
+            return true;
+        }
+    }
+    return false;
 }
 
 fn check_for_lowercase(letter: u8) bool {
@@ -50,13 +54,31 @@ fn check_for_uppercase(letter: u8) bool {
     return false;
 }
 
+fn check_for_specialchars(letter: u8) bool {
+    if (33 <= letter and letter <= 47) {
+        return true;
+    } else if (58 <= letter and letter <= 64) {
+        return true;
+    } else if (91 <= letter and letter <= 96) {
+        return true;
+    } else if (123 <= letter and letter <= 126) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+fn check_for_numbers(letter: u8) bool {
+    if (48 <= letter and letter <= 57) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 fn correct_password(password: []u8) []u8 {
-    // TODO: Make sure invalid characters END the method
-    for (password) |i| {
-        if (i == 32) {
-            std.debug.print("ERROR: Password contains invalid character!\n", .{});
-            break;
-        }
+    if (check_invalid_chars(password)) {
+        return password;
     }
 
     for (password, 0..password.len) |_, i| {
@@ -75,7 +97,7 @@ fn correct_password(password: []u8) []u8 {
 
 pub fn main() !void {
     std.debug.print("Current time: {d}\n", .{read_milliseconds()});
-    var password = [_]u8{ 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd' };
+    var password = [_]u8{ 'H', 'e', 'l', 'l', 'o', '%', 'W', 'o', 'r', 'l', 'd' };
     std.debug.print("Test: {s}\n", .{correct_password(&password)});
     std.debug.print("Current password: {d}\n", .{calc_num_of_pi(&password)});
 }
